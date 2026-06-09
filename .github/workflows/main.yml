@@ -1,0 +1,41 @@
+name: MLflow CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  training-job:
+    name: Train Model with MLflow
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: "3.10"
+
+      - name: Install MLflow
+        shell: bash -l {0}
+        run: |
+          pip install mlflow==2.19.0
+
+      - name: Run MLProject
+        shell: bash -l {0}
+        run: |
+          cd MLProject
+          mlflow run . --env-manager conda
+
+      - name: Upload MLruns Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: mlflow-artifacts
+          path: MLProject/mlruns/
+          retention-days: 7
