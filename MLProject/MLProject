@@ -1,0 +1,11 @@
+name: btc-trend-classification
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      n_estimators: {type: int, default: 100}
+      max_depth: {type: int, default: 5}
+      dataset: {type: string, default: "btc_preprocessing.csv"}
+    command: "python modelling.py {n_estimators} {max_depth} {dataset}"
