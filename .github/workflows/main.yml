@@ -7,6 +7,9 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   training-job:
     name: Train Model with MLflow
@@ -32,9 +35,20 @@ jobs:
         run: |
           mlflow run ./MLProject --env-manager conda
 
-      - name: Upload MLruns Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: mlflow-artifacts
-          path: mlruns
-          retention-days: 7
+      - name: Set up Git LFS
+        run: |
+          git config --global user.name "maisorpt"
+          git config --global user.email "maisorpt@gmail.com"
+          git lfs install
+          git lfs track "mlruns/**"
+          git add .gitattributes
+          git commit -m "Track large files in mlruns with Git LFS" || true
+          
+      - name: Save mlruns to repo
+        run: |
+          git config --global user.name "maisorpt"
+          git config --global user.email "maisorpt@gmail.com"
+          
+          git add -f mlruns/
+          git commit -m "Save mlruns from CI run [skip ci]" || true
+          git push origin main
